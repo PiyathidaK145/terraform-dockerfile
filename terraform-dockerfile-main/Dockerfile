@@ -1,13 +1,19 @@
-FROM node:18
+FROM alpine:3.21
 
-WORKDIR /usr/src/app
+# Install necessary packages
+RUN apk update && apk add --no-cache nodejs npm
 
-COPY package.json ./
-RUN npm install express  # ติดตั้ง express
+# Set working directory
+WORKDIR /app
 
-COPY app.js ./app.js
-COPY index.html ./index.html
+# Copy application files
+COPY . .
 
-EXPOSE 80
+# Install dependencies
+RUN npm install
 
+# Expose the port the app runs on
+EXPOSE 3002
+
+# Command to run the application
 CMD ["node", "app.js"]

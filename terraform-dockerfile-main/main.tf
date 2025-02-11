@@ -1,8 +1,13 @@
+
 terraform { 
   required_providers { 
     docker = { 
       source  = "kreuzwerker/docker" 
       version = "3.0.2" 
+    }
+    null = {
+      source  = "hashicorp/null"
+      version = "3.2.3"
     } 
   } 
 } 
@@ -19,31 +24,15 @@ resource "null_resource" "execute_script" {
 }
 
 resource "docker_image" "my_app" {
-  name = "my-docker-app"
+  name = "node-express-app:latest"
+  depends_on = [null_resource.execute_script]
 }
 
 resource "docker_container" "my_container" {
-  name = "my-container"
+  name = "my-express-app"
   image = docker_image.my_app.name
-  must_run = true
-}
-provider "docker" {
-  host = "unix:///var/run/docker.sock"
-}
-
-resource "docker_image" "web" {
-  name         = "my-express-app"
-  build {
-    context    = "."
-    dockerfile = "Dockerfile"
-  }
-}
-
-resource "docker_container" "web" {
-  name  = "my-express-container"
-  image = docker_image.web.image_id
   ports {
-    internal = 80
+    internal = 3002
     external = 80
   }
 }
